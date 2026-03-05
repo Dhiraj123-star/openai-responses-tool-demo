@@ -1,0 +1,17 @@
+# virtual environment
+venv
+# Python bytecode
+__pycache__/
+*.pyc
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+# Data files
+data/
+# Logs
+logs/
+# Model checkpoints
+checkpoints/
+# Environment variables
+.env
+# Ignore any other files you don't want to track
+.vscode
