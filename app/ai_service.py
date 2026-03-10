@@ -27,7 +27,7 @@ def ask_ai(question:str):
     tool_call= response.output[0]
     if tool_call.type=="function_call":
         args = json.loads(tool_call.arguments)
-        result = get_weather(args["city"])
+        tool_result = get_weather(args["city"])
 
         final_response = client.responses.create(
             model="gpt-4.1-mini",
@@ -36,7 +36,7 @@ def ask_ai(question:str):
                 {
                     "type":"function_call_output",
                     "call_id":tool_call.call_id,
-                    "output":result
+                    "output":tool_result
                 }
             ]
         )
