@@ -7,6 +7,13 @@ app = FastAPI(title="OpenAI Tool Calling API")
 class Query(BaseModel):
     question: str
 
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "service": "openai-tool-api"
+    }
+
 @app.post("/ask")
 def ask(query:Query):
     result = ask_ai(query.question)
