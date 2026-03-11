@@ -1,22 +1,13 @@
 import json
 from app.config import client
-from app.tools import get_weather
+from app.tools import get_weather,calculate,get_time
+from app.tool_registry import tools
 
-tools = [
-    {
-        "type":"function",
-        "name":"get_weather",
-        "description":"Get the current weather in a city",
-        "parameters":{
-            "type":"object",
-            "properties":{
-                "city":{"type":"string"}
-            },
-            "required":["city"],
-            "additionalProperties":False
-        } 
-    }
-]
+TOOL_MAP={
+    "get_weather":get_weather,
+    "calculate":calculate,
+    "get_time":get_time
+}
 
 def ask_ai(question:str):
     response = client.responses.create(
@@ -26,8 +17,10 @@ def ask_ai(question:str):
     )
     tool_call= response.output[0]
     if tool_call.type=="function_call":
+        tool_name = tool_call.name
         args = json.loads(tool_call.arguments)
-        tool_result = get_weather(args["city"])
+        tool_function= TOOL_MAP[tool_name]
+        tool_result = tool_function(**args)
 
         final_response = client.responses.create(
             model="gpt-4.1-mini",
