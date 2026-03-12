@@ -1,38 +1,50 @@
 # 🤖 OpenAI Responses API Tool Calling Demo
 
-A simple **AI-powered backend service** demonstrating **OpenAI Tool Calling using the Responses API** with a **FastAPI microservice architecture**.
+A lightweight **AI-powered backend service** demonstrating **OpenAI Tool Calling using the Responses API** within a **FastAPI microservice architecture**.
 
-This project showcases how an AI model can **autonomously decide to call external tools**, execute them locally, and return a refined response to the user.
+This project showcases how an AI model can **autonomously decide to call external tools**, execute them locally, and generate a refined response for the user.
 
-The application exposes a REST API where users send natural language questions and the AI dynamically invokes tools when required.
+The application exposes a REST API where users submit natural language queries and the AI **dynamically selects and invokes tools when necessary**.
 
 ---
 
 # 🚀 Core Features
 
-### 🧠 OpenAI Responses API
+## 🧠 OpenAI Responses API
 
-Uses the **latest OpenAI Responses API** to support structured **tool calling** and maintain conversation state using `previous_response_id`.
+Uses the **latest OpenAI Responses API** to support:
+
+* Structured **tool calling**
+* Iterative agent workflows
+* Conversation state management using:
+
+```
+previous_response_id
+```
+
+This enables a **multi-step interaction loop** between the AI model and backend tools.
 
 ---
 
-### 🔧 AI Tool Calling
+## 🔧 Dynamic AI Tool Calling
 
-The AI agent can dynamically call tools such as:
+The AI agent can dynamically invoke tools based on user queries.
 
-* 🌦 Weather information
+Currently implemented tools include:
+
+* 🌦 Weather lookup
 * 🧮 Calculator
 * 🕒 Time utility
 
-The model decides **which tool to use automatically**.
+The model determines **which tool to use automatically** without hardcoded routing logic.
 
 ---
 
-### ⚡ FastAPI Microservice
+## ⚡ FastAPI Microservice
 
-A lightweight and scalable **REST API service** built with FastAPI.
+The application exposes a **REST API built with FastAPI**, providing a lightweight and scalable backend service.
 
-Endpoints include:
+Available endpoints:
 
 ```
 GET  /health
@@ -41,35 +53,44 @@ POST /ask
 
 ---
 
-### 🐳 Dockerized Deployment
+## 🐳 Containerized Deployment
 
-The application can run in a **containerized environment** using:
+The service is fully containerized using:
 
 * Docker
 * Docker Compose
 
----
-
-### 🔐 Secure Configuration
-
-Sensitive credentials are stored in a `.env` file and loaded using environment variables.
-
-```
-OPENAI_API_KEY
-```
+This enables consistent environments for **local development and deployment**.
 
 ---
 
-### 🧩 Modular Architecture
+## 🔐 Secure Configuration
 
-The project follows a **clean separation of concerns**:
+Sensitive credentials are stored using environment variables and loaded via a `.env` file.
 
-* API Layer
-* AI orchestration layer
-* Tool implementations
-* Configuration management
+Example:
 
-This structure allows easy addition of **new AI tools**.
+```
+OPENAI_API_KEY=your_api_key
+```
+
+This prevents secrets from being exposed in source code.
+
+---
+
+## 🧩 Modular Architecture
+
+The project follows a **clean modular architecture** that separates responsibilities across components:
+
+| Layer                | Responsibility                  |
+| -------------------- | ------------------------------- |
+| API Layer            | FastAPI routes                  |
+| AI Service Layer     | OpenAI orchestration            |
+| Tool Registry        | Tool schemas for the model      |
+| Tool Implementations | Local tool execution            |
+| Configuration        | API clients & environment setup |
+
+This architecture allows **new tools to be added easily without modifying core logic**.
 
 ---
 
@@ -79,11 +100,11 @@ This structure allows easy addition of **new AI tools**.
 openai-responses-tool-demo
 │
 ├── app
-│   ├── main.py            # FastAPI application
-│   ├── ai_service.py      # OpenAI tool-calling orchestration
+│   ├── main.py            # FastAPI application entrypoint
+│   ├── ai_service.py      # OpenAI agent orchestration
 │   ├── tools.py           # Tool implementations
-│   ├── tool_registry.py   # Tool schemas for OpenAI
-│   ├── schemas.py         # Request/response models
+│   ├── tool_registry.py   # Tool schemas exposed to the AI model
+│   ├── schemas.py         # API request/response models
 │   └── config.py          # OpenAI client configuration
 │
 ├── Dockerfile
@@ -104,7 +125,9 @@ openai-responses-tool-demo
 get_weather(city: str)
 ```
 
-Example output:
+Returns simulated weather information.
+
+Example:
 
 ```
 The weather in Paris is 30°C and sunny.
@@ -117,6 +140,8 @@ The weather in Paris is 30°C and sunny.
 ```
 calculate(expression: str)
 ```
+
+Evaluates mathematical expressions.
 
 Example:
 
@@ -145,13 +170,13 @@ Current UTC time is 14:22:10
 
 # 🧠 Tool Calling Execution Flow
 
-The system follows a **two-step agent interaction pattern**.
+The system follows an **AI agent execution loop**.
 
 ---
 
-### 1️⃣ User Request
+## 1️⃣ User Request
 
-User sends a question:
+A user sends a question to the API:
 
 ```
 POST /ask
@@ -167,11 +192,11 @@ Example request:
 
 ---
 
-### 2️⃣ AI Decision
+## 2️⃣ AI Decision
 
-The OpenAI model analyzes the query and decides whether to call a tool.
+The OpenAI model analyzes the question and decides whether a tool should be called.
 
-Example:
+Example tool call:
 
 ```
 get_weather(city="Paris")
@@ -179,7 +204,7 @@ get_weather(city="Paris")
 
 ---
 
-### 3️⃣ Local Tool Execution
+## 3️⃣ Local Tool Execution
 
 The backend executes the corresponding Python function:
 
@@ -189,19 +214,21 @@ tools.get_weather()
 
 ---
 
-### 4️⃣ Tool Output Submission
+## 4️⃣ Tool Output Submission
 
-The tool result is sent back to the model using:
+The tool result is returned to the model using:
 
 ```
 previous_response_id
 ```
 
+This allows the model to continue the reasoning process.
+
 ---
 
-### 5️⃣ Final AI Response
+## 5️⃣ Final AI Response
 
-The model combines reasoning with the tool output and returns the final answer.
+The model generates the final response incorporating the tool output.
 
 Example:
 
@@ -215,7 +242,7 @@ Example:
 
 # ⚙️ Setup & Installation
 
-## 1️⃣ Clone Repository
+## 1️⃣ Clone the Repository
 
 ```
 git clone https://github.com/dhiraj123-star/openai-responses-tool-demo.git
@@ -226,7 +253,7 @@ cd openai-responses-tool-demo
 
 ## 2️⃣ Create Environment File
 
-Create a `.env` file:
+Create a `.env` file in the root directory:
 
 ```
 OPENAI_API_KEY=your_api_key_here
@@ -242,7 +269,7 @@ pip install -r requirements.txt
 
 ---
 
-## 4️⃣ Run the API
+## 4️⃣ Run the API Server
 
 ```
 uvicorn app.main:app --reload
@@ -264,19 +291,21 @@ http://localhost:8000/docs
 
 # 🐳 Run with Docker
 
-### Build container
+## Build the Container
 
 ```
 docker compose build
 ```
 
-### Start service
+---
+
+## Start the Service
 
 ```
 docker compose up
 ```
 
-API will be available at:
+The API will be available at:
 
 ```
 http://localhost:8000
@@ -284,13 +313,13 @@ http://localhost:8000
 
 ---
 
-# 🩺 Health Check
+# 🩺 Health Check Endpoint
 
 ```
 GET /health
 ```
 
-Response:
+Example response:
 
 ```json
 {
@@ -303,32 +332,14 @@ Response:
 
 # 🎯 Learning Outcomes
 
-This project demonstrates:
+This project demonstrates practical implementation of:
 
-* Using **OpenAI Responses API**
-* Implementing **AI Tool Calling**
-* Designing **AI microservices with FastAPI**
-* Creating **modular AI tool architectures**
-* Building **containerized AI services**
-* Implementing **agent-tool interaction workflows**
-
----
-
-# 📌 Future Improvements
-
-Possible enhancements:
-
-* Streaming AI responses
-* Parallel tool execution
-* Observability and logging
-* External API integrations
-* Multi-agent orchestration
-* Rate limiting and authentication
+* OpenAI **Responses API**
+* AI **Tool Calling architecture**
+* **Agent-style workflows**
+* FastAPI **microservices**
+* Modular **AI tool design**
+* **Containerized backend services**
 
 ---
 
-# 📜 License
-
-MIT License
-
----
