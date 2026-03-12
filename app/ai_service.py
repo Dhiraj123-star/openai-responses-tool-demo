@@ -3,6 +3,7 @@ from app.config import client
 from app.tools import get_weather,calculate,get_time
 from app.tool_registry import tools
 
+# Tool mapping
 TOOL_MAP={
     "get_weather":get_weather,
     "calculate":calculate,
@@ -15,25 +16,34 @@ def ask_ai(question:str):
         input=question,
         tools=tools
     )
-    tool_call= response.output[0]
-    if tool_call.type=="function_call":
-        tool_name = tool_call.name
-        args = json.loads(tool_call.arguments)
-        tool_function= TOOL_MAP[tool_name]
-        tool_result = tool_function(**args)
+    while True:
+        # if the model produced final text response
+        if response.output_text:
+            return response.output_text
+        
+        tool_outputs =[]
 
-        final_response = client.responses.create(
+        for item in response.output:
+            if item.type=="function_call":
+                tool_name = item.name
+                args= json.loads(item.arguments)
+
+                tool_function = TOOL_MAP.get(tool_name)
+
+                if tool_function is None:
+                    continue
+                result = tool_function(**args)
+
+                tool_outputs.append(
+                    {
+                        "type":"function_call_output",
+                        "call_id": item.call_id,
+                        "output":result
+                    }
+                )
+        # send tool results back to the model
+        response = client.responses.create(
             model="gpt-4.1-mini",
-            previous_response_id = response.id,
-            input = [
-                {
-                    "type":"function_call_output",
-                    "call_id":tool_call.call_id,
-                    "output":tool_result
-                }
-            ]
+            previous_response_id=response.id,
+            input=tool_outputs
         )
-
-        return final_response.output_text
-    
-    return response.output_text
