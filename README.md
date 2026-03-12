@@ -2,7 +2,7 @@
 
 A simple **AI-powered backend service** demonstrating **OpenAI Tool Calling using the Responses API** with a **FastAPI microservice architecture**.
 
-This project shows how an AI model can **autonomously decide to call external tools**, execute them locally, and return a refined response to the user.
+This project showcases how an AI model can **autonomously decide to call external tools**, execute them locally, and return a refined response to the user.
 
 The application exposes a REST API where users send natural language questions and the AI dynamically invokes tools when required.
 
@@ -12,34 +12,64 @@ The application exposes a REST API where users send natural language questions a
 
 ### 🧠 OpenAI Responses API
 
-Uses the **latest Responses API** to enable structured tool calling and maintain conversation context.
+Uses the **latest OpenAI Responses API** to support structured **tool calling** and maintain conversation state using `previous_response_id`.
 
-### 🔧 Tool Calling Workflow
+---
 
-The AI can automatically trigger external tools such as:
+### 🔧 AI Tool Calling
 
-* Weather information tool
+The AI agent can dynamically call tools such as:
 
-### ⚡ FastAPI Backend
+* 🌦 Weather information
+* 🧮 Calculator
+* 🕒 Time utility
 
-Provides a clean and scalable REST API service.
+The model decides **which tool to use automatically**.
+
+---
+
+### ⚡ FastAPI Microservice
+
+A lightweight and scalable **REST API service** built with FastAPI.
+
+Endpoints include:
+
+```
+GET  /health
+POST /ask
+```
+
+---
 
 ### 🐳 Dockerized Deployment
 
-The service can run inside a container using **Docker and Docker Compose**.
+The application can run in a **containerized environment** using:
+
+* Docker
+* Docker Compose
+
+---
 
 ### 🔐 Secure Configuration
 
-Uses environment variables (`.env`) to securely manage API keys.
+Sensitive credentials are stored in a `.env` file and loaded using environment variables.
+
+```
+OPENAI_API_KEY
+```
+
+---
 
 ### 🧩 Modular Architecture
 
-Separates:
+The project follows a **clean separation of concerns**:
 
-* API layer
-* AI orchestration
-* Tool logic
-* Configuration
+* API Layer
+* AI orchestration layer
+* Tool implementations
+* Configuration management
+
+This structure allows easy addition of **new AI tools**.
 
 ---
 
@@ -49,13 +79,15 @@ Separates:
 openai-responses-tool-demo
 │
 ├── app
-│   ├── main.py          # FastAPI application entrypoint
-│   ├── ai_service.py    # OpenAI Responses API orchestration
-│   ├── tools.py         # External tool implementations
-│   └── config.py        # OpenAI client configuration
+│   ├── main.py            # FastAPI application
+│   ├── ai_service.py      # OpenAI tool-calling orchestration
+│   ├── tools.py           # Tool implementations
+│   ├── tool_registry.py   # Tool schemas for OpenAI
+│   ├── schemas.py         # Request/response models
+│   └── config.py          # OpenAI client configuration
 │
-├── Dockerfile           # Production Docker image
-├── docker-compose.yml   # Container orchestration
+├── Dockerfile
+├── docker-compose.yml
 │
 ├── requirements.txt
 ├── .env
@@ -64,25 +96,15 @@ openai-responses-tool-demo
 
 ---
 
-# 🛠 Implemented Tool
+# 🛠 Implemented Tools
 
-## Weather Tool
+## 🌦 Weather Tool
 
 ```
 get_weather(city: str)
 ```
 
-Returns weather information for a given city.
-
-Example:
-
-Input
-
-```
-Paris
-```
-
-Output
+Example output:
 
 ```
 The weather in Paris is 30°C and sunny.
@@ -90,19 +112,52 @@ The weather in Paris is 30°C and sunny.
 
 ---
 
+## 🧮 Calculator Tool
+
+```
+calculate(expression: str)
+```
+
+Example:
+
+```
+Input: 345 * 22
+Output: 7590
+```
+
+---
+
+## 🕒 Time Tool
+
+```
+get_time(city: str)
+```
+
+Returns the current **UTC time** using a timezone-aware datetime object.
+
+Example:
+
+```
+Current UTC time is 14:22:10
+```
+
+---
+
 # 🧠 Tool Calling Execution Flow
 
-The system follows a **two-step agentic interaction pattern** with the OpenAI API.
+The system follows a **two-step agent interaction pattern**.
+
+---
 
 ### 1️⃣ User Request
 
-A user sends a question to the API:
+User sends a question:
 
 ```
 POST /ask
 ```
 
-Example:
+Example request:
 
 ```json
 {
@@ -112,9 +167,9 @@ Example:
 
 ---
 
-### 2️⃣ Model Tool Decision
+### 2️⃣ AI Decision
 
-The OpenAI model determines that the request requires external data and returns a **tool call request**.
+The OpenAI model analyzes the query and decides whether to call a tool.
 
 Example:
 
@@ -134,9 +189,9 @@ tools.get_weather()
 
 ---
 
-### 4️⃣ Tool Result Submission
+### 4️⃣ Tool Output Submission
 
-The result is sent back to the OpenAI API using:
+The tool result is sent back to the model using:
 
 ```
 previous_response_id
@@ -146,9 +201,9 @@ previous_response_id
 
 ### 5️⃣ Final AI Response
 
-The model combines reasoning with the tool output and returns a final answer.
+The model combines reasoning with the tool output and returns the final answer.
 
-Example response:
+Example:
 
 ```json
 {
@@ -193,6 +248,18 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
+API will start at:
+
+```
+http://localhost:8000
+```
+
+Swagger documentation:
+
+```
+http://localhost:8000/docs
+```
+
 ---
 
 # 🐳 Run with Docker
@@ -215,10 +282,21 @@ API will be available at:
 http://localhost:8000
 ```
 
-Swagger UI:
+---
+
+# 🩺 Health Check
 
 ```
-http://localhost:8000/docs
+GET /health
+```
+
+Response:
+
+```json
+{
+  "status": "healthy",
+  "service": "openai-tool-api"
+}
 ```
 
 ---
@@ -228,22 +306,24 @@ http://localhost:8000/docs
 This project demonstrates:
 
 * Using **OpenAI Responses API**
-* Implementing **LLM Tool Calling**
+* Implementing **AI Tool Calling**
 * Designing **AI microservices with FastAPI**
-* Managing **agent-tool interaction loops**
-* Containerizing AI services with **Docker**
+* Creating **modular AI tool architectures**
+* Building **containerized AI services**
+* Implementing **agent-tool interaction workflows**
 
 ---
 
 # 📌 Future Improvements
 
-Planned enhancements:
+Possible enhancements:
 
-* Add **health check endpoint**
-* Add **multiple tools (calculator, time, etc.)**
-* Implement **dynamic tool routing**
-* Support **multi-agent orchestration**
-* Add **observability and logging**
+* Streaming AI responses
+* Parallel tool execution
+* Observability and logging
+* External API integrations
+* Multi-agent orchestration
+* Rate limiting and authentication
 
 ---
 
