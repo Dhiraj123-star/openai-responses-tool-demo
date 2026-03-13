@@ -1,6 +1,6 @@
 # 🤖 OpenAI Responses API Tool Calling Demo
 
-A lightweight **AI-powered backend service** demonstrating **OpenAI Tool Calling using the Responses API** within a **FastAPI microservice architecture**.
+A lightweight **AI-powered backend service** demonstrating **OpenAI Tool Calling using the OpenAI Responses API** within a **FastAPI microservice architecture**.
 
 This project showcases how an AI model can **autonomously decide to call external tools**, execute them locally, and generate a refined response for the user.
 
@@ -12,10 +12,10 @@ The application exposes a REST API where users submit natural language queries a
 
 ## 🧠 OpenAI Responses API
 
-Uses the **latest OpenAI Responses API** to support:
+Uses the **OpenAI Responses API** to support:
 
 * Structured **tool calling**
-* Iterative agent workflows
+* Iterative **agent workflows**
 * Conversation state management using:
 
 ```
@@ -36,7 +36,7 @@ Currently implemented tools include:
 * 🧮 Calculator
 * 🕒 Time utility
 
-The model determines **which tool to use automatically** without hardcoded routing logic.
+The model determines **which tool to call automatically** without any hardcoded routing logic.
 
 ---
 
@@ -60,37 +60,59 @@ The service is fully containerized using:
 * Docker
 * Docker Compose
 
-This enables consistent environments for **local development and deployment**.
+This ensures **consistent environments for local development and deployment**.
 
 ---
 
 ## 🔐 Secure Configuration
 
-Sensitive credentials are stored using environment variables and loaded via a `.env` file.
+Sensitive credentials such as the OpenAI API key are **not stored inside the Docker image**.
 
-Example:
+Instead they are injected at **runtime using environment variables**.
+
+Example `.env` file:
 
 ```
-OPENAI_API_KEY=your_api_key
+OPENAI_API_KEY=your_api_key_here
 ```
 
-This prevents secrets from being exposed in source code.
+Docker Compose loads the environment variables automatically.
 
 ---
 
-## 🧩 Modular Architecture
+## ⚙️ CI/CD Pipeline (GitHub Actions)
 
-The project follows a **clean modular architecture** that separates responsibilities across components:
+The project includes a **simple CI/CD pipeline using GitHub Actions**.
 
-| Layer                | Responsibility                  |
-| -------------------- | ------------------------------- |
-| API Layer            | FastAPI routes                  |
-| AI Service Layer     | OpenAI orchestration            |
-| Tool Registry        | Tool schemas for the model      |
-| Tool Implementations | Local tool execution            |
-| Configuration        | API clients & environment setup |
+The pipeline automatically:
 
-This architecture allows **new tools to be added easily without modifying core logic**.
+1️⃣ Builds the Docker image
+2️⃣ Logs in to DockerHub
+3️⃣ Pushes the image to DockerHub
+
+DockerHub repository:
+
+```
+dhiraj918106/openai-responses-tool-demo
+```
+
+The pipeline runs automatically on every push to the **main branch**.
+
+---
+
+# 🧩 Modular Architecture
+
+The project follows a **clean modular architecture** that separates responsibilities across components.
+
+| Layer                | Responsibility                      |
+| -------------------- | ----------------------------------- |
+| API Layer            | FastAPI routes                      |
+| AI Service Layer     | OpenAI orchestration                |
+| Tool Registry        | Tool schemas exposed to OpenAI      |
+| Tool Implementations | Local tool execution                |
+| Configuration        | OpenAI client and environment setup |
+
+This architecture allows **new tools to be added easily without modifying the AI orchestration logic**.
 
 ---
 
@@ -103,7 +125,7 @@ openai-responses-tool-demo
 │   ├── main.py            # FastAPI application entrypoint
 │   ├── ai_service.py      # OpenAI agent orchestration
 │   ├── tools.py           # Tool implementations
-│   ├── tool_registry.py   # Tool schemas exposed to the AI model
+│   ├── tool_registry.py   # Tool schemas exposed to OpenAI
 │   ├── schemas.py         # API request/response models
 │   └── config.py          # OpenAI client configuration
 │
@@ -112,6 +134,11 @@ openai-responses-tool-demo
 │
 ├── requirements.txt
 ├── .env
+│
+├── .github
+│   └── workflows
+│       └── docker-build.yml   # GitHub Actions CI/CD pipeline
+│
 └── README.md
 ```
 
@@ -194,7 +221,7 @@ Example request:
 
 ## 2️⃣ AI Decision
 
-The OpenAI model analyzes the question and decides whether a tool should be called.
+The OpenAI model analyzes the question and determines whether a tool should be used.
 
 Example tool call:
 
@@ -230,7 +257,7 @@ This allows the model to continue the reasoning process.
 
 The model generates the final response incorporating the tool output.
 
-Example:
+Example response:
 
 ```json
 {
@@ -253,7 +280,7 @@ cd openai-responses-tool-demo
 
 ## 2️⃣ Create Environment File
 
-Create a `.env` file in the root directory:
+Create a `.env` file:
 
 ```
 OPENAI_API_KEY=your_api_key_here
@@ -269,19 +296,19 @@ pip install -r requirements.txt
 
 ---
 
-## 4️⃣ Run the API Server
+## 4️⃣ Run the API
 
 ```
 uvicorn app.main:app --reload
 ```
 
-API will start at:
+The API will start at:
 
 ```
 http://localhost:8000
 ```
 
-Swagger documentation:
+Swagger UI:
 
 ```
 http://localhost:8000/docs
@@ -291,7 +318,7 @@ http://localhost:8000/docs
 
 # 🐳 Run with Docker
 
-## Build the Container
+### Build the container
 
 ```
 docker compose build
@@ -299,13 +326,13 @@ docker compose build
 
 ---
 
-## Start the Service
+### Start the service
 
 ```
 docker compose up
 ```
 
-The API will be available at:
+The API will run at:
 
 ```
 http://localhost:8000
@@ -332,14 +359,19 @@ Example response:
 
 # 🎯 Learning Outcomes
 
-This project demonstrates practical implementation of:
+This project demonstrates:
 
-* OpenAI **Responses API**
-* AI **Tool Calling architecture**
-* **Agent-style workflows**
-* FastAPI **microservices**
-* Modular **AI tool design**
-* **Containerized backend services**
+* Using the **OpenAI Responses API**
+* Implementing **AI Tool Calling**
+* Designing **AI-powered FastAPI microservices**
+* Creating **modular AI tool architectures**
+* Building **containerized backend services**
+* Implementing **CI/CD pipelines with GitHub Actions**
 
 ---
 
+# 📜 License
+
+MIT License
+
+---
